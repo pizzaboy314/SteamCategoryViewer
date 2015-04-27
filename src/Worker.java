@@ -64,6 +64,9 @@ public class Worker {
 
 
 		StringBuilder sb = new StringBuilder();
+		for (String s : user1games) {
+			sb.append(s + "\n");
+		}
 
 		resultString = sb.toString();
 		resultText.setText(resultString);
