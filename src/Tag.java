@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 
 
+@SuppressWarnings("rawtypes")
 public class Tag implements Comparable {
 
 	private String name;
