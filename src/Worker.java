@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -28,6 +29,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class Worker {
 	
 	public static ArrayList<SteamGame> usergames;
+	public static ArrayList<Tag> usertags;
 
 	private static JFrame resultFrame;
 	private static JTextArea resultText;
@@ -54,18 +56,22 @@ public class Worker {
 		}
 
 
-		// System.out.println(userName1 + " " + userName2);
 		String comURL = "http://steamcommunity.com/id/";
 		String endURL = "/games/?tab=all&sort=name";
 
 		String user1URL = comURL + userName1 + endURL;
 
-		usergames = parseHTML(user1URL);
-
+		parseHTML(user1URL);
+		grabTagsAndAddGames();
 
 		StringBuilder sb = new StringBuilder();
-		for (SteamGame game : usergames) {
-			sb.append(game.getName() + "\n");
+		for (Tag t : usertags) {
+			sb.append(t.getName() + ":\n");
+			ArrayList<SteamGame> list = t.getGames();
+			for(SteamGame sg : list){
+				sb.append(sg.getName() + "\n");
+			}
+			sb.append("\n");
 		}
 
 		resultString = sb.toString();
@@ -77,8 +83,29 @@ public class Worker {
 
 	}
 
-	public static ArrayList<SteamGame> parseHTML(String input) {
-		ArrayList<SteamGame> games = new ArrayList<SteamGame>();
+	@SuppressWarnings("unchecked")
+	public static void grabTagsAndAddGames() {
+		usertags = new ArrayList<Tag>();
+		for (SteamGame game : usergames) {
+			ArrayList<String> tags = game.getTags();
+			for (String s : tags) {
+				Tag t = new Tag(s);
+
+				if (usertags.contains(t)) {
+					Tag tmp = usertags.get(usertags.indexOf(t));
+					tmp.addGame(game);
+					// System.out.println(tmp.getName());
+				} else {
+					t.addGame(game);
+					usertags.add(t);
+				}
+			}
+		}
+		Collections.sort(usertags);
+	}
+
+	public static void parseHTML(String input) {
+		usergames = new ArrayList<SteamGame>();
 		String url = input;
 
 		try {
@@ -126,7 +153,7 @@ public class Worker {
 							if (gameTitle != null && gameID != null) {
 								game = new SteamGame(gameTitle, gameID);
 								if (!game.isDlc()) {
-									games.add(game);
+									usergames.add(game);
 								}
 								break;
 							}
@@ -143,8 +170,6 @@ public class Worker {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		return games;
 	}
 
 	public synchronized static void resultWindow() {
