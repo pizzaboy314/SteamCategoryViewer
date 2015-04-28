@@ -15,13 +15,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -77,6 +80,7 @@ public class Worker {
 		resultString = sb.toString();
 		resultText.setText(resultString);
 		resultFrame.setVisible(true);
+		resultFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 
 		System.out.println();
@@ -105,6 +109,23 @@ public class Worker {
 	}
 
 	public static void parseHTML(String input) {
+		JFrame frame = new JFrame("Parsing webpages...");
+		frame.setPreferredSize(new Dimension(300, 120));
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+		JLabel label1 = new JLabel();
+		label1.setPreferredSize(new Dimension(200, 40));
+		label1.setHorizontalAlignment(JLabel.CENTER);
+		panel.add(label1);
+
+		frame.add(panel);
+		frame.pack();
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+
 		usergames = new ArrayList<SteamGame>();
 		String url = input;
 
@@ -135,7 +156,11 @@ public class Worker {
 				if (inputLine.contains("rgGames")) {
 					String s = inputLine.replace("var rgGames = [{", "").replace("}];", "").trim();
 					String[] apps = s.split("\\},\\{");
-					for (String app : apps) {
+					for (int i = 0; i < apps.length; i++) {
+						String app = apps[i];
+						float f = 100 * ((float) (i + 1)) / ((float) apps.length);
+						label1.setText(f + "% finished parsing...");
+
 						SteamGame game;
 						String gameTitle = null;
 						Integer gameID = null;
@@ -158,7 +183,7 @@ public class Worker {
 								break;
 							}
 
-							System.out.println(param);
+							// System.out.println(param);
 						}
 					}
 				}
