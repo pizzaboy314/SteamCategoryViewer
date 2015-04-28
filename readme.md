@@ -1,5 +1,3 @@
-WORK IN PROGRESS, NOT FINISHED YET
-
 what does this do?
 
 takes a steam username as input and outputs the user-defined tags attributed to that game in the store, along with the games that belong to that category.
